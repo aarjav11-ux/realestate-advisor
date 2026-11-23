@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gurgaon Property Buyer Questionnaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfaf7;--fg:#14213d;--muted:#5b6475;--line:#e3e7ee;--card:#ffffff;--acc:#c2611f;--acc-soft:#fff4ec;--ok:#2f7d5b;--warn:#b45309;--bad:#c2410c;--navy:#14213d;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:0 16px 120px}
+.hero{padding:40px 0 20px}
+.hero h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+.hero p{color:var(--muted);margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.facts span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--muted)}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.bar .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:500}
+.bar .meta b{color:var(--fg)}
+.track{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}
+.track i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.dots{display:flex;gap:4px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.dots button{flex:1 0 auto;min-width:22px;height:6px;padding:0;margin:0;border:0;border-radius:3px;background:var(--line);cursor:pointer}
+.dots button.done{background:var(--ok)}.dots button.cur{background:var(--acc)}
+.step{display:none}.step.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.step-head{margin:4px 0 18px}
+.step-head .k{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
+.step-head h2{font-size:24px;margin:4px 0 2px;letter-spacing:-.01em}
+.step-head p{margin:0;color:var(--muted);font-size:14px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;margin:0 0 14px}
+.q>label.t{display:block;font-weight:600;font-size:16.5px;margin-bottom:12px}
+.q .n{color:var(--muted);font-weight:500;margin-right:6px}
+.req:after{content:" *";color:var(--bad)}
+.w{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px;background:var(--bg);color:var(--muted);white-space:nowrap}
+.w5{background:#fdecec;color:#b42318}.w4{background:#fff4e5;color:#b45309}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row .q{margin-bottom:14px}
+@media(max-width:560px){.row{grid-template-columns:1fr;gap:0}.hero h1{font-size:25px}}
+input[type=number],input[type=text],input[type=email]{width:100%;padding:13px 14px;font:inherit;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);outline:none;transition:border-color .15s}
+input[type=number]:focus,input[type=text]:focus,input[type=email]:focus{border-color:var(--acc);background:var(--card)}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--acc)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center}
+.opt:has(input:checked){border-color:var(--acc);background:var(--acc-soft)}
+.opt:has(input:checked) .dot{border-color:var(--acc)}
+.opt:has(input:checked) .dot:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.opt:has(input:focus-visible){outline:2px solid var(--acc);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{border:1.5px solid var(--line);padding:8px 14px;border-radius:999px;cursor:pointer;font-size:15px;transition:all .15s;user-select:none}
+.chips label:hover{border-color:var(--acc)}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips label:has(input:checked){border-color:var(--acc);background:var(--acc);color:#fff}
+.chips label:has(input:checked) span:before{content:"✓ "}
+.err{border-color:var(--bad)!important;box-shadow:0 0 0 3px rgba(194,65,12,.15)}
+.err-msg{color:var(--bad);font-size:13px;margin:-6px 0 12px;display:none}.err .err-msg{display:block}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.nav .in{max-width:720px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.nav .hint{flex:1;font-size:13px;color:var(--muted)}
+button{font:inherit;font-weight:600;padding:12px 22px;border:0;border-radius:10px;background:var(--acc);color:#fff;cursor:pointer}
+button.ghost{background:transparent;color:var(--fg);border:1.5px solid var(--line)}
+button:disabled{opacity:.4;cursor:default}
+#go{display:none}
+#out{margin-top:20px;padding:22px;background:var(--card);border:1.5px solid var(--acc);border-radius:14px;display:none}
+#out h3{margin-top:0}#out li{margin:6px 0}
+#saved{font-size:15px;font-weight:500;color:var(--ok);margin:16px 0 0}
+.sample{display:flex;align-items:center;gap:14px;margin-top:18px;padding:14px 16px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;color:var(--fg);text-decoration:none;transition:border-color .15s}
+.sample:hover{border-color:var(--acc)}
+.sample-ic{flex:none;width:44px;height:52px;border-radius:6px;background:var(--acc-soft);color:var(--acc);font-size:12px;font-weight:700;display:grid;place-items:center}
+.sample-tx{flex:1;display:flex;flex-direction:column;gap:2px}.sample-tx span{font-size:13px;color:var(--muted);line-height:1.45}
+.sample-go{flex:none;font-weight:600;color:var(--acc);font-size:14px}
+@media(max-width:560px){.sample-go{display:none}}
+h1,h2,.step-head h2{font-family:'Space Grotesk',Inter,sans-serif}
+.topnav{background:var(--navy);color:#f7f5f0}
+.topnav .in{max-width:720px;margin:0 auto;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.topnav a{color:inherit;text-decoration:none}
+.topnav .logo{font-family:'Space Grotesk',Inter,sans-serif;font-weight:700;font-size:19px;display:flex;align-items:center;gap:10px}
+.topnav .logo i{width:28px;height:28px;border-radius:8px;background:var(--acc);display:grid;place-items:center;font-style:normal;font-size:15px}
+.topnav .home{font-size:14px;opacity:.85}.topnav .home:hover{opacity:1}
+.hero .eb{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+button:not(.ghost){box-shadow:0 6px 18px rgba(194,97,31,.25)}
+#thanks{display:none;max-width:760px;margin:10px auto 60px}
+#thanks .tk-hero{text-align:center;padding:36px 20px 10px}
+#thanks .tick{width:68px;height:68px;border-radius:50%;background:var(--ok);color:#fff;font-size:36px;line-height:68px;margin:0 auto 14px}
+#thanks h2{font-family:'Space Grotesk',Inter,sans-serif;font-size:30px;margin:0 0 6px}
+#thanks .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:18px}
+#thanks .card h3{margin:0 0 12px;font-size:18px}
+#thanks ol.next{margin:0;padding-left:20px;line-height:1.7}
+#thanks .fq{margin:16px 0}#thanks .fq>b{display:block;margin-bottom:8px;font-size:15px}
+#thanks .stars button{font-size:32px;background:none;border:0;color:#d6dae2;cursor:pointer;padding:0 3px;line-height:1}
+#thanks .stars button.on{color:#f59e0b}
+#thanks .pills{display:flex;flex-wrap:wrap;gap:8px}
+#thanks .pills label{border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:14px;background:#fff}
+#thanks .pills input{display:none}#thanks .pills label:has(input:checked){background:var(--acc-soft);border-color:var(--acc);color:var(--acc);font-weight:600}
+#thanks textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;box-sizing:border-box}
+#thanks .fb-btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-weight:600;font-size:15px;cursor:pointer}
+#thanks .fb-err{color:var(--bad);font-size:14px;display:none}
+#thanks .fb-done{display:none;text-align:center;padding:10px 0}
+</style></head><body><div class="topnav"><div class="in"><a class="logo" href="https://aarjav11-ux.github.io/realestate/"><i>🏢</i>Gurgaon Property Advisor</a><a class="home" href="https://aarjav11-ux.github.io/realestate/">← Back to website</a></div></div><main>
+<header class="hero">
+<span class="eb">Booking se pehle ek baar</span>
+<h1>Find the right Gurgaon property for you</h1>
+<p>Answer questions about your budget, family, location and how you plan to use the property. We’ll email you a personalised report with the projects and sectors that fit you best.</p>
+<div class="facts"><span>⏱ About 15–20 minutes</span><span>21 short steps</span><span>Answers saved on this device</span></div>
+</header>
+<div class="bar"><div class="meta"><span id="stepname"><b>Step 1</b></span><span id="pc">0 of 100 answered</span></div><div class="track"><i id="pb"></i></div><div class="dots" id="dots"></div></div>
+<section class="step on" id="s-contact">
+<div class="step-head"><div class="k">Before we start</div><h2>Where should we send your report?</h2><p>We only use these details to send your report.</p></div>
+<div class="q" id="qc-name"><label class="t req" for="cname">Your name</label><p class="err-msg">Please enter your name.</p><input type="text" id="cname" autocomplete="name" placeholder="e.g. Priya Sharma"></div>
+<div class="q" id="qc-email"><label class="t req" for="cemail">Email</label><p class="err-msg">Please enter a valid email address.</p><input type="email" id="cemail" autocomplete="email" placeholder="you@example.com"></div>
+<div class="q"><label class="t" for="cphone">Phone <span style="color:var(--muted);font-weight:400">(optional)</span></label><input type="tel" id="cphone" autocomplete="tel" placeholder="e.g. 98xxxxxx10" style="width:100%;padding:13px 14px;font:inherit;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg)"></div>
+</section>
+<form id="f"></form>
+<p id="saved"></p>
+<div id="out"></div>
+<section id="thanks">
+<div class="tk-hero"><div class="tick">✓</div><h2 id="tk-h">Thank you!</h2><p style="color:var(--muted);margin:0">Your answers are in. Your consultation has started.</p></div>
+<div class="card"><h3>What happens next</h3><ol class="next">
+<li>We go through your answers, giving the most weight to what matters most to you.</li>
+<li>We match them against our research library and cross-check with a second opinion.</li>
+<li>Your detailed PDF report, with the 3 best-fit options for you, is emailed to <b id="tk-mail"></b>.</li></ol>
+<p style="color:var(--muted);font-size:14px;margin:12px 0 0">Don’t see it? Check your spam or promotions folder.</p></div>
+<div class="card" id="tk-sum"></div>
+<div class="card" id="fb"><h3>How was this for you?</h3><p style="color:var(--muted);margin:0 0 6px;font-size:14px">A minute of feedback helps us improve. Optional.</p>
+<div class="fq"><b>Overall, how would you rate the experience?</b><div class="stars" id="fb-stars"></div></div>
+<div class="fq"><b>How easy were the questions to answer?</b><div class="pills" data-k="ease"></div></div>
+<div class="fq"><b>How did the length feel?</b><div class="pills" data-k="length"></div></div>
+<div class="fq"><b>Were any questions confusing or unclear?</b><div class="pills" data-k="confusing"></div></div>
+<div class="fq"><b>Did the questions cover what matters to you?</b><div class="pills" data-k="coverage"></div></div>
+<div class="fq"><b>Would you recommend this consultation to a friend?</b><div class="pills" data-k="recommend"></div></div>
+<div class="fq"><b>How did you hear about us?</b><div class="pills" data-k="source"></div></div>
+<div class="fq"><b>Anything we should add, remove or improve?</b><textarea id="fb-text" placeholder="e.g. a question that was confusing, something we missed…"></textarea></div>
+<p class="fb-err" id="fb-err">Please pick a star rating first.</p>
+<button type="button" class="fb-btn" id="fb-go">Send feedback</button></div>
+<div class="card fb-done" id="fb-done"><h3 style="margin:0">🙏 Thanks for the feedback!</h3><p style="color:var(--muted);margin:6px 0 0">It goes straight to us and helps make this better.</p></div>
+</section>
+
+</main>
+<nav class="nav"><div class="in"><button type="button" class="ghost" id="back">Back</button><span class="hint" id="hint"></span><button type="button" id="next">Next</button><button id="go" type="button">Get my recommendation</button></div></nav>
+<script>
+// type: n=number, t=text, r=radio, m=multi-select. Options split by |
+const S=[["Buyer Profile & Purpose", [["r", "What is your primary intent for buying property in Gurgaon?", "Self-use (end-user)|Investment for capital appreciation|Investment for rental income|Hybrid (rent now, live later)", 1], ["r", "What is your target holding period before you expect to exit or realise gains?", "Under 1 year (flipping)|1–3 years|3–5 years|5–10 years|10+ years (generational)", 1], ["t", "How many family members will live in the home, and what are their ages?", "e.g. 4: 2 working adults, 1 toddler, 1 senior", 0], ["r", "Which best describes you as a buyer?", "First-time home buyer|Upgrading from current home|Experienced property investor|NRI / outstation buyer", 0], ["r", "If you are an NRI, what is the main goal of this purchase?", "Not an NRI|Capital appreciation for repatriation|Retirement / family home|Rental income", 0], ["r", "Where do you live today?", "Gurgaon|Delhi|Noida / Ghaziabad|Elsewhere in India|Outside India", 0], ["r", "What is the age of the main buyer?", "Under 30|30–39|40–49|50–59|60+", 0], ["r", "In whose name will the property be registered? (affects stamp duty)", "Male|Female|Joint (male + female)|Company / HUF", 0]]], ["Budget & Financing", [["n", "What is your maximum all-inclusive budget, in lakhs? (e.g. 250 = ₹2.5 Cr)", "e.g. 250", 1, "budget"], ["n", "How much ready cash do you have for the down payment and booking, in lakhs?", "e.g. 50", 1], ["r", "What share of the price do you plan to fund with a home loan?", "0% (fully self-funded)|Up to 50%|50% to 75%|75% to 80% (maximum allowed)", 1], ["n", "What is your monthly household take-home income, in rupees?", "e.g. 300000", 0], ["r", "Will the new EMI plus existing loan EMIs stay below 50% of take-home income?", "Yes, comfortably|Borderline (around 50%)|No (over 50%)", 1], ["r", "Does this purchase depend on selling an existing property?", "No, fully independent|Yes, already listed or under agreement|Yes, not yet listed", 1], ["r", "If that sale is delayed 6–12 months, can you still pay construction instalments?", "Yes, I have backup funds|Partly, for 3–6 months|No|Not applicable", 1], ["r", "Which payment plan suits your cash flow?", "Down payment plan|Construction-linked plan (CLP)|Subvention / 10:90, 20:80, 30:70 plans|Time-linked plan|Not sure", 0], ["r", "Is your income stable enough to carry the EMI through a job change or business slowdown?", "Yes, 12+ months of buffer|Some buffer (3–6 months)|Little or no buffer", 0], ["r", "Do you have a home-loan pre-approval already?", "Yes|Applied|No|Not taking a loan", 0]]], ["Location & Connectivity", [["m", "Which Gurgaon micro-markets are you considering?", "Golf Course Road|Golf Course Extension Road|Southern Peripheral Road (SPR)|Dwarka Expressway|New Gurgaon (Sec 81–95)|Sohna|Central Gurgaon / HUDA sectors|Open to suggestions", 1], ["t", "Where do the earning members of the family work?", "e.g. Cyber City, Aerocity, Udyog Vihar, Noida, WFH", 1], ["r", "What is the longest one-way daily commute your family will accept?", "Under 15 minutes|15–30 minutes|30–45 minutes|45–60 minutes|Does not matter (remote / investor)", 0], ["r", "How important is quick, signal-free access to Delhi (NH-48, UER-II, Dwarka Expressway)?", "Critical (daily Delhi commute)|Moderate (weekends / airport)|Low (Gurgaon lifestyle)", 0], ["r", "How important is a metro station within 10 minutes?", "Essential|Nice to have|Not needed", 0], ["r", "Are you comfortable buying in an emerging area where water, sewer and roads may take 3–5 years to mature?", "Yes, for the capital upside|No, I need developed infrastructure today", 1], ["t", "Which schools or hospitals do you need within 5–7 km?", "e.g. DPS, Heritage, Medanta, Fortis, Artemis", 0], ["r", "How important is being close to the airport (IGI)?", "Very important|Somewhat important|Not important", 0], ["r", "How important is being near malls, markets and restaurants?", "Very important|Somewhat|Not important", 0]]], ["Property Type", [["r", "Which type of property fits your lifestyle?", "High-rise gated apartment|Low-rise independent builder floor|Plot in a gated plotted development|Independent villa|Commercial / studio apartment|Open to advice", 1], ["r", "If considering builder floors, which kind?", "Open to DDJAY floors (<180 sq yd)|Only premium gated low-rise (DLF / Adani / Birla type)|Floors on HUDA plots|Not interested in floors", 0], ["r", "Are you willing to co-manage water, STP and maintenance with other floor owners?", "Yes, comfortable with low-rise management|No, I prefer professional facility management", 0], ["r", "If considering a plot, what is the plan?", "Build a home within 1–2 years|Hold land for growth (3–7 years)|Build stilt + 4 floors to sell|Not considering plots", 0]]], ["Construction Stage", [["r", "What construction stage do you want?", "Ready to move in (OC received)|Near completion (OC within 6–12 months)|Under construction (2–3 years)|New launch / pre-launch (3–5 years)|Open to advice", 1], ["r", "Are you paying rent that would be hard to carry alongside a loan during construction?", "Yes, heavy rent (need possession soon)|Moderate rent (can manage 1–2 years)|No rent / own home", 1], ["r", "Will you accept construction-delay risk (often 12–24 months in Gurgaon) for a lower launch price?", "Yes, for a lower entry price|No, I need guaranteed possession", 1], ["r", "How do you feel about resale (secondary market) properties?", "Prefer resale (see before I buy)|Open to resale or new|Only new from the developer", 0], ["r", "When do you need to move in or start earning rent?", "Immediately|Within 1 year|1–3 years|3+ years is fine", 0]]], ["Configuration & Space", [["r", "Which configuration do you need?", "2 BHK|2 BHK + study|3 BHK (compact)|3 BHK + servant room|3.5 / 4 BHK|Penthouse / duplex (5+ BHK)", 1], ["n", "What is the minimum carpet area you need, in sq ft (RERA carpet, excluding balconies)?", "e.g. 1200", 0], ["r", "How much loading (super area over carpet area) will you accept?", "Low (under 30%)|Moderate (30–38%)|High (40–45%) if amenities are large|Not sure", 0], ["r", "Do you need a servant room with a separate washroom?", "Must have|Nice to have|Not needed", 0], ["t", "Which special rooms do you need (WFH study, pooja room, guest room)?", "e.g. separate WFH study and pooja alcove", 0], ["r", "What master bedroom size do you need?", "Compact (10×12 ft)|Standard (12×14 ft)|Large (14×16 ft or bigger)", 0], ["r", "How many balconies or how much outdoor space do you want?", "One balcony is fine|2+ balconies|Large deck / terrace|No preference", 0]]], ["Floor, Facing & Vastu", [["r", "Which floor range do you prefer in a tower?", "Low (1–5, garden / elderly-friendly)|Mid (6–18)|High (19+, views, less dust)|Top / penthouse|No preference", 0], ["r", "Which view do you prefer from the living room?", "Central green / clubhouse|Aravalli hills / nature|City skyline / expressway|Open low-rise view|No preference", 0], ["r", "How important is Vastu for the main entrance?", "Strictly North / North-East|East is fine|West is fine|South-facing ruled out|Vastu not important", 0], ["r", "Do you want a corner unit with 2–3 open sides?", "Must be corner with 3 sides open|2 sides open is fine|Single side open is fine", 0]]], ["Density & Privacy", [["r", "How dense a community will you accept (homes per acre)?", "Ultra-low (under 40)|Low to mid (40–60)|Standard high-rise (60–85)|High density (85+) is fine", 1], ["r", "How many apartments per lift lobby do you prefer?", "2 per core (private lobby)|3–4 per core|5+ per core is fine", 0], ["r", "What lift provision do you expect per tower?", "3+ passenger lifts + stretcher/service lift|2 passenger + 1 service lift|2 lifts is fine", 0], ["r", "How large a project do you prefer?", "Boutique (under 300 homes)|Mid-size (300–1,000)|Large township (1,000+)|No preference", 0]]], ["Parking", [["r", "How many covered car parks do you need?", "1|2|3 or more", 1], ["r", "What parking type is acceptable?", "Basement only|Stilt is fine|Podium is fine|Open / stacked is fine", 0], ["r", "Do you need EV charging at your parking bay?", "Must have|Common charging is fine|Not needed", 0]]], ["Amenities & Lifestyle", [["r", "What size of clubhouse do you want?", "Large (50,000+ sq ft, full sports)|Standard (20,000–35,000 sq ft, gym and pool)|Small club / community hall|None needed", 0], ["m", "Which children’s facilities are must-haves?", "Learning / activity centre|Sports coaching|Covered play areas|Crèche / daycare|None needed", 0], ["m", "Which senior-citizen facilities are must-haves?", "Wheelchair ramps|Senior park / walking track|Hobby club|On-site medical room|None needed", 0], ["r", "How important is green, open space inside the project?", "Very important (large central green)|Some green is enough|Not important", 0], ["r", "Do you need a pet-friendly society?", "Yes|No preference", 0], ["r", "How important is 24×7 security with access control?", "Essential|Basic security is fine", 0]]], ["Developer", [["r", "Which tier of developer will you buy from?", "Tier 1 / listed (DLF, Tata, Godrej, Sobha, Emaar etc.)|Established regional (10+ years delivering in Gurgaon)|First-time developer / landowner JV|Brand doesn’t matter if price and location are right", 1], ["r", "What delivery record do you require from the developer?", "On-time delivery on the last 3 projects|Minor delays (under 1 year) are acceptable|Track record not important", 1], ["r", "Will you buy from a developer with active litigation or insolvency (NCLT) on earlier projects?", "No, zero tolerance|Only if this project is ring-fenced and debt-free|Yes, for a deep discount", 1], ["r", "How important is the developer’s record of maintaining delivered societies?", "Very important|Somewhat important|Not important", 0]]], ["Legal & RERA", [["r", "Must the project be registered with Haryana RERA?", "Yes, RERA registration is a must|RERA applied is acceptable|I’d consider pre-launch / EOI before RERA", 1], ["r", "Would you pay an EOI (Expression of Interest) cheque before RERA registration?", "No|Yes, I understand allotments can be cancelled or delayed|Not sure what this means", 1], ["r", "How strict are you about land title (licensed, encumbrance-free, no village pockets)?", "Must be 100% clear and verified|A lender mortgage with NOC is acceptable|Not sure how to check", 1], ["r", "For a resale property, do you need the full original chain of title documents?", "Yes, complete original chain|Certified copies are acceptable|Not considering resale", 1], ["r", "Which bank approval of the project do you want?", "Approved by SBI|A private bank (HDFC / ICICI) is enough|NBFC is enough|Not needed (no loan)", 1], ["r", "Will you hire a property lawyer to check documents before booking?", "Yes|Maybe|No", 0]]], ["Site Red Flags", [["r", "Is being next to an open drain (naala) acceptable?", "No, must be far away|OK if 200 m+ away|Doesn’t matter", 0], ["r", "Is a high-tension power line near the project acceptable?", "No, must be completely clear|OK on the outer sector road|Doesn’t matter", 0], ["r", "Is a project next to a village, cattle yard or crematorium acceptable?", "No|Village is OK, crematorium is not|Doesn’t matter", 0], ["r", "What approach road do you require?", "Fully built 24 m / 60 m sector road|Partly built road is acceptable|Temporary village road is acceptable while roads come up", 1], ["r", "How do you feel about areas with monsoon waterlogging history (e.g. some sectors near CPR)?", "Must have no waterlogging history|Mild, quickly draining water is OK|Doesn’t matter", 0]]], ["Civic Infrastructure", [["r", "Do you require municipal (GMDA) piped canal water?", "Yes, must have|Line laid, awaiting connection is OK|Borewell / tanker water is OK", 1], ["r", "Do you require a connection to the municipal sewer line?", "Yes|Awaiting connection with internal STP is OK|Not important", 0], ["r", "What grid power reliability do you require?", "Sector substation commissioned (reliable grid)|Grid with outages and DG backup is OK|Mostly DG power for now is OK", 0]]], ["Specifications & Finishes", [["r", "Do you need specific brands written into the Builder-Buyer Agreement (sanitaryware, ACs)?", "Yes, named brands|Mixed is OK|“Or equivalent” is OK|Not sure", 0], ["r", "Which flooring do you expect in living and master bedroom?", "Imported marble|Large vitrified tiles|Engineered wood|Builder’s choice is fine", 0], ["r", "What kitchen do you expect at handover?", "Fully fitted with hob, chimney and appliances|Modular cabinets only|Bare shell is fine", 0], ["r", "Do you want ACs and wardrobes included?", "Yes, both|ACs only|Wardrobes only|Not needed", 0]]], ["Maintenance & Running Costs", [["r", "What monthly maintenance (CAM) budget is comfortable?", "₹2,000–3,500|₹4,000–7,000|₹8,000–15,000+", 1], ["r", "Are you comfortable with DG power backup rates (often ₹18–25 per unit) during outages?", "Yes, budgeted|Partly, need an estimate|Wasn’t aware", 0]]], ["Taxes & Charges", [["m", "Which statutory costs have you already included in your budget?", "Stamp duty (7% male, 5% female, 6% joint)|GST on under-construction (5%, or 1% affordable)|1% TDS above ₹50 lakh|None yet, I need a full breakdown", 1], ["m", "Which developer charges have you checked beyond the base price?", "EDC / IDC|PLC (preferential location: park, pool, corner)|Electricity meter and power backup charges|Club membership fee|IFMSD (maintenance security deposit)|None yet", 1], ["r", "Did you know GST input tax credit is not passed on to buyers of under-construction homes?", "Yes|No, please explain", 0], ["r", "If selling another property, have you planned for the 12.5% long-term capital gains tax (no indexation)?", "Yes, with my CA|Reinvesting under Section 54 / 54F|Wasn’t aware|Not selling anything", 0]]], ["Rental & Exit", [["r", "What gross annual rental yield do you expect?", "2–3% (typical luxury Gurgaon)|3.5–4.5% (near Cyber City / Golf Course Road)|5%+ (commercial / studio / co-living)|Not concerned (self-use or capital gain)", 0], ["r", "Which tenant profile do you want to attract?", "Senior corporate / MNC executives|Mid-level IT / corporate professionals|Industrial workforce|Not renting out", 0], ["r", "Do you need freedom to resell (transfer) during construction?", "Yes, unrestricted transfers|First transfer free is fine|OK if locked until 35–50% paid or possession|Not planning to resell early", 1], ["r", "Will you pay builder transfer fees (often ₹250–1,000+ per sq ft) if you exit before registry?", "Yes, budgeted|No|I will hold until registry / possession", 0], ["r", "How important is it that the home is easy to sell later?", "Very important|Somewhat|Not important (long-term hold)", 0]]], ["Timing & Mindset", [["r", "When are you ready to make a booking payment?", "Within 7–14 days for the right property|Within 30–60 days|Within 3–6 months|Just exploring (6+ months)", 1], ["r", "What is driving the purchase right now?", "Life-stage need and fair valuation|Price momentum / fear of missing out|Looking for a distressed / value deal", 0], ["r", "If prices fall 10–15% or stay flat for 3 years, will you be financially fine?", "Yes, I can hold long term|Manageable but uncomfortable|No, I am counting on quick appreciation", 1], ["t", "Have you already shortlisted or visited any projects?", "e.g. DLF Privana, Emaar Gurgaon Greens, none yet", 0], ["r", "Are you working with a broker already?", "No|Yes, one broker|Yes, several brokers|Buying directly from developers", 0]]], ["Deal-breakers", [["m", "Which of these are absolute deal-breakers for you?", "No builder floors|No under-construction projects|No unlisted / regional developers|No high-density projects (70+ homes/acre)|No projects next to villages|No high-tension lines nearby|No approach roads under 30 m|None of these", 1], ["t", "Anything else we should know about what you want?", "e.g. must allow pets, close to parents in Sector 56", 0]]]];
+const W={"1": 5, "2": 5, "3": 4, "4": 3, "5": 4, "6": 3, "7": 3, "8": 4, "9": 5, "10": 5, "11": 5, "12": 4, "13": 5, "14": 5, "15": 5, "16": 4, "17": 4, "18": 3, "19": 5, "20": 5, "21": 4, "22": 4, "23": 3, "24": 5, "25": 3, "26": 2, "27": 2, "28": 5, "29": 4, "30": 4, "31": 4, "32": 5, "33": 5, "34": 5, "35": 4, "36": 4, "37": 5, "38": 4, "39": 3, "40": 4, "41": 3, "42": 3, "43": 2, "44": 4, "45": 3, "46": 4, "47": 3, "48": 5, "49": 4, "50": 3, "51": 3, "52": 5, "53": 4, "54": 3, "55": 4, "56": 3, "57": 3, "58": 3, "59": 2, "60": 3, "61": 5, "62": 5, "63": 5, "64": 4, "65": 5, "66": 5, "67": 5, "68": 5, "69": 5, "70": 3, "71": 4, "72": 4, "73": 4, "74": 5, "75": 4, "76": 5, "77": 4, "78": 4, "79": 4, "80": 3, "81": 3, "82": 2, "83": 5, "84": 3, "85": 5, "86": 5, "87": 3, "88": 4, "89": 4, "90": 4, "91": 5, "92": 4, "93": 4, "94": 5, "95": 4, "96": 5, "97": 4, "98": 2, "99": 5, "100": 3};
+const SRC=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100];
+const WL=['','Minor','Low','Moderate','High','Decisive'],KW={};
+const f=document.getElementById('f');let N=0,html='';
+S.forEach(([title,qs],si)=>{html+=`<section class="step" data-title="${title}"><div class="step-head"><div class="k">Step ${si+2} of ${S.length+1}</div><h2>${title}</h2><p>${qs.length} questions</p></div>`;let pair=[];
+ qs.forEach(q=>{N++;const [ty,t,o,req,key]=q;const id='q'+N,nm=key||id,rq=req?'req':'',wt=W[SRC[N-1]];KW[nm]=wt;let b='';
+  if(ty=='n'||ty=='t')b=`<input type="${ty=='n'?'number':'text'}" name="${nm}" id="${id}" placeholder="${o}" ${ty=='n'?'min="0"':''}>`;
+  else if(ty=='r')b='<div class="opts">'+o.split('|').map(x=>`<label class="opt"><input type="radio" name="${nm}" value="${x}"><span class="dot"></span><span>${x}</span></label>`).join('')+'</div>';
+  else b='<div class="chips">'+o.split('|').map(x=>`<label><input type="checkbox" name="${nm}" value="${x}"><span>${x}</span></label>`).join('')+'</div>';
+  const blk=`<div class="q" data-n="${nm}" data-req="${req}" data-w="${wt}"><label class="t ${rq}" for="${id}"><span class="n">${N}.</span>${t}<span class="w w${wt}" title="Importance weight ${wt} of 5">${WL[wt]}</span></label><p class="err-msg">Please answer this question.</p>${b}</div>`;
+  if(ty=='n'&&(key=='mkm'||key=='ykm')){pair.push(blk);if(pair.length==2){html+=`<div class="row">${pair.join('')}</div>`;pair=[]}}else html+=blk;});html+='</section>';});
+f.innerHTML=html;
+const blocks=[...f.querySelectorAll('.q')];
+function answered(b){const els=f.querySelectorAll(`[name="${b.dataset.n}"]`);return [...els].some(e=>(e.type=='radio'||e.type=='checkbox')?e.checked:e.value.trim()!=='')}
+function prog(){const a=blocks.filter(answered).length;pc.textContent=`${a} of ${N} answered`;pb.style.width=a/N*100+'%'}
+f.addEventListener('input',prog);
+try{const s=JSON.parse(localStorage.getItem('req')||'{}');for(const[k,v]of Object.entries(s))[].concat(v).forEach(x=>{f.querySelectorAll(`[name="${k}"]`).forEach(e=>{if(e.type=='radio'||e.type=='checkbox'){if(e.value==x)e.checked=true}else e.value=x})});prog()}catch(e){}
+// ---- step-by-step navigation ----
+const steps=[document.getElementById('s-contact'),...f.querySelectorAll('.step')];let cur=0;
+const dots=document.getElementById('dots');
+steps.forEach((st,i)=>{const d=document.createElement('button');d.type='button';d.title=i?st.dataset.title:'Your details';d.onclick=()=>show(i);dots.appendChild(d)});
+const contactOk=()=>cname.value.trim()&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cemail.value.trim());
+function stepDone(i){if(i==0)return !!contactOk();return [...steps[i].querySelectorAll('.q')].every(b=>b.dataset.req!='1'||answered(b))}
+function show(i){cur=Math.max(0,Math.min(steps.length-1,i));steps.forEach((st,j)=>st.classList.toggle('on',j==cur));
+ [...dots.children].forEach((d,j)=>{d.className=j==cur?'cur':(stepDone(j)?'done':'')});
+ stepname.innerHTML=`<b>Step ${cur+1} of ${steps.length}</b> · ${cur?steps[cur].dataset.title:'Your details'}`;
+ back.disabled=cur==0;const last=cur==steps.length-1;next.style.display=last?'none':'inline-block';go.style.display=last?'inline-block':'none';
+ hint.textContent=last?'Last step!':'';if(show.ready)window.scrollTo({top:document.querySelector('.bar').offsetTop,behavior:'smooth'});
+ try{localStorage.setItem('req-step',cur)}catch(e){}}
+function flag(i){let bad=[];if(i==0){qc_name.classList.toggle('err',!cname.value.trim());qc_email.classList.toggle('err',!contactOk()&&!!cname.value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cemail.value.trim()));bad=[...steps[0].querySelectorAll('.err')]}
+ else{steps[i].querySelectorAll('.q').forEach(b=>{const m=b.dataset.req=='1'&&!answered(b);b.classList.toggle('err',m);if(m)bad.push(b)})}
+ if(bad.length)bad[0].scrollIntoView({behavior:'smooth',block:'center'});return !bad.length}
+const qc_name=document.getElementById('qc-name'),qc_email=document.getElementById('qc-email');
+next.onclick=()=>{if(flag(cur))show(cur+1)};back.onclick=()=>show(cur-1);
+document.addEventListener('input',e=>{const q=e.target.closest('.q');if(q&&q.classList.contains('err'))q.classList.remove('err');
+ [...dots.children].forEach((d,j)=>{if(j!=cur)d.className=stepDone(j)?'done':''})});
+// auto-advance focus: after picking a radio, gently scroll to the next question
+f.addEventListener('change',e=>{if(e.target.type!='radio')return;const q=e.target.closest('.q');const nx=q&&q.nextElementSibling;if(nx&&nx.classList.contains('q')&&!answered(nx))setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'center'}),150)});
+try{const c=JSON.parse(localStorage.getItem('req-contact')||'{}');if(c.n)cname.value=c.n;if(c.e)cemail.value=c.e;if(c.p)cphone.value=c.p}catch(e){}
+const s_contact_save=()=>{try{localStorage.setItem('req-contact',JSON.stringify({n:cname.value,e:cemail.value,p:cphone.value}))}catch(e){}};
+[cname,cemail,cphone].forEach(el=>el.addEventListener('input',s_contact_save));
+show(0);show.ready=true;
+function data(){const d={};new FormData(f).forEach((v,k)=>{if(v==='')return;d[k]=k in d?[].concat(d[k],v):v});return d}
+f.addEventListener('change',()=>{try{localStorage.setItem('req',JSON.stringify(data()))}catch(e){}});
+
+go.onclick=()=>{if(go.disabled)return;blocks.forEach(b=>b.classList.remove('err'));const miss=blocks.filter(b=>b.dataset.req=='1'&&!answered(b));
+ if(!contactOk()){show(0);flag(0);return}
+ if(miss.length){const si=steps.findIndex(st=>st.contains(miss[0]));show(si);setTimeout(()=>flag(si),300);hint.textContent=miss.length+' required question(s) still to answer';return}
+ const d=data();
+ const tw=blocks.reduce((t,b)=>t+ +b.dataset.w,0),aw=blocks.filter(answered).reduce((t,b)=>t+ +b.dataset.w,0),conf=Math.round(aw/tw*100);
+ const dec=blocks.filter(b=>b.dataset.w=='5'&&answered(b)).map(b=>{const q=b.querySelector('label.t').firstChild.nextSibling.textContent;const v=[].concat(d[b.dataset.n]??[]).join(', ');return {q,v,k:b.dataset.n}});
+ const top=dec.filter(x=>!['budget','items'].includes(x.k)&&x.v!==d.budget);
+ const bud=d.budget?+d.budget:'',warn=[];
+ out.style.display='block';out.innerHTML=`<h3 style="margin-top:0">Thank you! Here’s what matters most to you</h3>
+ <p><b>Confidence: ${conf}%</b> <span style="color:var(--muted)">(share of total question weight you answered)</span></p>
+ <ul>${dec.slice(0,8).map(x=>`<li><b>${x.q}</b> ${x.v}</li>`).join('')}</ul>
+ <p style="color:var(--muted);font-size:14px">Your detailed personalised report with our top 3 picks will be emailed to you.</p>`;
+ out.scrollIntoView({behavior:'smooth'});
+ // Save the submission: every question with its weight and answer, plus the computed profile
+ const answers=blocks.map((b,i)=>{const v=[].concat(d[b.dataset.n]??[]);return{n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:+b.dataset.w,a:v.join(', ')}}).filter(r=>r.a);
+ const profile={budget:bud,fuel:top[0]?top[0].v:'',gearbox:top[1]?top[1].v:'',body:top[2]?top[2].v:'',confidence:conf,warnings:warn};
+ saveSub({name:cname.value.trim(),contact:cemail.value.trim()+(cphone.value.trim()?' · '+cphone.value.trim():''),submittedAt:new Date().toISOString(),status:'new',answers,profile});};
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwSMA9dt0j44iWKHdCzifmDDrMKR20ARDj4iAjxjLDVe3bz1O2vEvn2uqp_8EwTsPSW/exec';
+async function saveSub(doc){saved.textContent='Submitting your answers…';go.disabled=true;go.textContent='Submitting…';
+ try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(doc)});
+  saved.textContent=`✓ Submitted. We'll email your personalised property report to ${cemail.value.trim()} shortly.`;showThanks()}
+ catch(e){go.disabled=false;go.textContent='Get my recommendation';saved.textContent="Your recommendation is shown above, but your answers couldn't be submitted. Please check your connection and try again."}}
+
+// ---- thank-you page + feedback ----
+const PRODUCT='car';
+const FB={ease:['Very easy','Easy','Okay','Difficult'],length:['Too short','Just right','A bit long','Too long'],confusing:['None','A few','Many'],coverage:['Yes, fully','Mostly','Missed some things'],recommend:['Yes','Maybe','No'],source:['WhatsApp','A friend','Social media','Other']};
+document.querySelectorAll('#thanks .pills').forEach(p=>{p.innerHTML=FB[p.dataset.k].map(v=>`<label><input type="radio" name="fb-${p.dataset.k}" value="${v}">${v}</label>`).join('')});
+let fbStar=0;const st=document.getElementById('fb-stars');
+st.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" aria-label="${n} star${n>1?'s':''}">★</button>`).join('');
+st.onclick=e=>{const n=+e.target.dataset.n;if(!n)return;fbStar=n;[...st.children].forEach(b=>b.classList.toggle('on',+b.dataset.n<=n));document.getElementById('fb-err').style.display='none'};
+function showThanks(){const nm=cname.value.trim().split(' ')[0];
+ document.getElementById('tk-h').textContent=`Thank you${nm?', '+nm:''}!`;document.getElementById('tk-mail').textContent=cemail.value.trim();
+ const sum=document.getElementById('tk-sum');if(out.innerHTML.trim()){sum.innerHTML=out.innerHTML;out.style.display='none';const h=sum.querySelector('h3');if(h)h.textContent='What matters most to you';const l=sum.querySelector('p:last-child');if(l&&/emailed/.test(l.textContent))l.remove()}else sum.style.display='none';
+ document.querySelectorAll('main > *:not(#thanks)').forEach(el=>el.style.display='none');document.querySelector('nav.nav').style.display='none';
+ document.getElementById('thanks').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+ try{localStorage.removeItem(LSK);localStorage.removeItem(LSK+'-step');localStorage.removeItem(LSK+'-contact')}catch(e){}}
+const LSK='req';
+document.getElementById('fb-go').onclick=async()=>{if(!fbStar){document.getElementById('fb-err').style.display='block';return}
+ const g=k=>(document.querySelector(`[name="fb-${k}"]:checked`)||{}).value||'';
+ const answers=[{n:1,q:'Overall rating (1-5)',w:0,a:String(fbStar)},...Object.keys(FB).map((k,i)=>({n:i+2,q:document.querySelector(`[data-k="${k}"]`).previousElementSibling.textContent,w:0,a:g(k)})),{n:9,q:'Suggestions',w:0,a:document.getElementById('fb-text').value.trim()}].filter(r=>r.a);
+ const b=document.getElementById('fb-go');b.disabled=true;b.textContent='Sending…';
+ try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({name:'FEEDBACK · '+cname.value.trim(),contact:cemail.value.trim(),profile:{budget:'',fuel:'Rating '+fbStar+'/5',gearbox:'Ease: '+g('ease'),body:'Length: '+g('length'),confidence:'',warnings:[]},answers})})}catch(e){}
+ document.getElementById('fb').style.display='none';document.getElementById('fb-done').style.display='block'};
+</script></body></html>
