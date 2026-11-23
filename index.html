@@ -97,7 +97,7 @@ button:not(.ghost){box-shadow:0 6px 18px rgba(194,97,31,.25)}
 #thanks .fb-done{display:none;text-align:center;padding:10px 0}
 .dbt{margin-top:10px;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
 .dbt:hover{border-color:#b42318;color:#b42318}.dbt.on{background:#fde8e6;border-color:#b42318;color:#b42318}.dbt:disabled{opacity:.45;cursor:not-allowed}
-.q.isdb{border-left:4px solid #b42318;padding-left:12px}
+.dbt.full{opacity:.55}.dbn{font-size:13px;color:#b42318;margin:6px 0 0}.q.isdb{border-left:4px solid #b42318;padding-left:12px}
 .bar .meta{gap:14px}#dbc{font-size:13px;font-weight:600;color:#b42318;margin-left:auto}#dbmsg{font-size:13px;color:#b42318;margin:6px 0 0;min-height:1em}
 </style></head><body><div class="topnav"><div class="in"><a class="logo" href="https://aarjav11-ux.github.io/realestate/"><i>🏢</i>Gurgaon Property Advisor</a><a class="home" href="https://aarjav11-ux.github.io/realestate/">← Back to website</a></div></div><main>
 <header class="hero">
@@ -167,14 +167,14 @@ f.addEventListener('input',prog);
 const DB_MAX=10;let DB=new Set();try{DB=new Set(JSON.parse(localStorage.getItem('req-db')||'[]'))}catch(e){}
 const dbc=document.createElement('span');dbc.id='dbc';document.querySelector('.bar .meta').appendChild(dbc);
 function dbRender(){DB.forEach(k=>{const b=blocks.find(x=>x.dataset.n==k);if(!b||!answered(b))DB.delete(k)});
- const full=DB.size>=DB_MAX;dbc.textContent=`⛔ Deal-breakers: ${DB.size} / ${DB_MAX}`;
+ const full=DB.size>=DB_MAX;dbc.textContent=`⛔ Deal-breakers: ${DB.size} / ${DB_MAX}`;const dm=document.getElementById('dbmsg');dm.style.color=full?'#b42318':'var(--muted)';dm.innerHTML=full?`<b>You have reached the limit of ${DB_MAX} deal-breakers.</b> Remove one to mark another.`:`You can mark at most <b>${DB_MAX}</b> answers as deal-breakers` + (DB.size?` · <b>${DB_MAX-DB.size}</b> left.`:'. Answer a question, then tap <b>Mark as deal-breaker</b>.');
  blocks.forEach(b=>{const t=b.querySelector('.dbt'),on=DB.has(b.dataset.n);b.classList.toggle('isdb',on);t.classList.toggle('on',on);
-  t.textContent=on?'⛔ Deal-breaker (tap to remove)':'Mark as deal-breaker';t.disabled=!on&&(full||!answered(b));
+  t.textContent=on?'⛔ Deal-breaker (tap to remove)':'Mark as deal-breaker';t.disabled=!on&&!answered(b);t.classList.toggle('full',!on&&full);
   t.title=!on&&full?`You can mark at most ${DB_MAX} deal-breakers. Remove one to add another.`:!answered(b)?'Answer this question first':''});
  try{localStorage.setItem('req-db',JSON.stringify([...DB]))}catch(e){}}
 blocks.forEach(b=>{const t=document.createElement('button');t.type='button';t.className='dbt';b.appendChild(t);
 
- t.onclick=()=>{const k=b.dataset.n;if(DB.has(k))DB.delete(k);else if(DB.size<DB_MAX&&answered(b))DB.add(k);dbRender()}});
+ t.onclick=()=>{const k=b.dataset.n;let n=b.querySelector('.dbn');if(!n){n=document.createElement('p');n.className='dbn';b.appendChild(n)}n.textContent='';if(DB.has(k))DB.delete(k);else if(DB.size>=DB_MAX){n.textContent=`You have reached the limit of ${DB_MAX} deal-breakers. Remove one before adding this.`}else if(answered(b)){DB.add(k);if(DB.size==DB_MAX)n.textContent=`That’s ${DB_MAX} of ${DB_MAX}: you have reached the deal-breaker limit.`}dbRender()}});
 f.addEventListener('input',dbRender);f.addEventListener('change',dbRender);setTimeout(dbRender,0);
 
 try{const s=JSON.parse(localStorage.getItem('req')||'{}');for(const[k,v]of Object.entries(s))[].concat(v).forEach(x=>{f.querySelectorAll(`[name="${k}"]`).forEach(e=>{if(e.type=='radio'||e.type=='checkbox'){if(e.value==x)e.checked=true}else e.value=x})});prog()}catch(e){}
