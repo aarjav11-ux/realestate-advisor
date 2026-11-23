@@ -95,6 +95,10 @@ button:not(.ghost){box-shadow:0 6px 18px rgba(194,97,31,.25)}
 #thanks .fb-btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-weight:600;font-size:15px;cursor:pointer}
 #thanks .fb-err{color:var(--bad);font-size:14px;display:none}
 #thanks .fb-done{display:none;text-align:center;padding:10px 0}
+.dbt{margin-top:10px;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.dbt:hover{border-color:#b42318;color:#b42318}.dbt.on{background:#fde8e6;border-color:#b42318;color:#b42318}.dbt:disabled{opacity:.45;cursor:not-allowed}
+.q.isdb{border-left:4px solid #b42318;padding-left:12px}
+.bar .meta{gap:14px}#dbc{font-size:13px;font-weight:600;color:#b42318;margin-left:auto}#dbmsg{font-size:13px;color:#b42318;margin:6px 0 0;min-height:1em}
 </style></head><body><div class="topnav"><div class="in"><a class="logo" href="https://aarjav11-ux.github.io/realestate/"><i>🏢</i>Gurgaon Property Advisor</a><a class="home" href="https://aarjav11-ux.github.io/realestate/">← Back to website</a></div></div><main>
 <header class="hero">
 <span class="eb">Booking se pehle ek baar</span>
@@ -106,7 +110,7 @@ button:not(.ghost){box-shadow:0 6px 18px rgba(194,97,31,.25)}
 <span class="sample-tx"><b>See a sample report</b><span>What you’ll receive: a ~38-page personalised report with 3 recommended Gurgaon projects, a one-page summary, side-by-side comparison, total cost and EMI, site-visit and document checklists, and why other projects were ruled out.</span></span>
 <span class="sample-go">View →</span></a>
 </header>
-<div class="bar"><div class="meta"><span id="stepname"><b>Step 1</b></span><span id="pc">0 of 100 answered</span></div><div class="track"><i id="pb"></i></div><div class="dots" id="dots"></div></div>
+<div class="bar"><div class="meta"><span id="stepname"><b>Step 1</b></span><span id="pc">0 of 100 answered</span></div><div class="track"><i id="pb"></i></div><p id="dbmsg" style="color:var(--muted)">Tip: after answering, tap <b>Mark as deal-breaker</b> on up to 10 answers you won’t compromise on.</p><div class="dots" id="dots"></div></div>
 <section class="step on" id="s-contact">
 <div class="step-head"><div class="k">Before we start</div><h2>Where should we send your report?</h2><p>We only use these details to send your report.</p></div>
 <div class="q" id="qc-name"><label class="t req" for="cname">Your name</label><p class="err-msg">Please enter your name.</p><input type="text" id="cname" autocomplete="name" placeholder="e.g. Priya Sharma"></div>
@@ -159,6 +163,20 @@ const blocks=[...f.querySelectorAll('.q')];
 function answered(b){const els=f.querySelectorAll(`[name="${b.dataset.n}"]`);return [...els].some(e=>(e.type=='radio'||e.type=='checkbox')?e.checked:e.value.trim()!=='')}
 function prog(){const a=blocks.filter(answered).length;pc.textContent=`${a} of ${N} answered`;pb.style.width=a/N*100+'%'}
 f.addEventListener('input',prog);
+// ---- deal-breakers: user marks up to DB_MAX answered questions as non-negotiable ----
+const DB_MAX=10;let DB=new Set();try{DB=new Set(JSON.parse(localStorage.getItem('req-db')||'[]'))}catch(e){}
+const dbc=document.createElement('span');dbc.id='dbc';document.querySelector('.bar .meta').appendChild(dbc);
+function dbRender(){DB.forEach(k=>{const b=blocks.find(x=>x.dataset.n==k);if(!b||!answered(b))DB.delete(k)});
+ const full=DB.size>=DB_MAX;dbc.textContent=`⛔ Deal-breakers: ${DB.size} / ${DB_MAX}`;
+ blocks.forEach(b=>{const t=b.querySelector('.dbt'),on=DB.has(b.dataset.n);b.classList.toggle('isdb',on);t.classList.toggle('on',on);
+  t.textContent=on?'⛔ Deal-breaker (tap to remove)':'Mark as deal-breaker';t.disabled=!on&&(full||!answered(b));
+  t.title=!on&&full?`You can mark at most ${DB_MAX} deal-breakers. Remove one to add another.`:!answered(b)?'Answer this question first':''});
+ try{localStorage.setItem('req-db',JSON.stringify([...DB]))}catch(e){}}
+blocks.forEach(b=>{const t=document.createElement('button');t.type='button';t.className='dbt';b.appendChild(t);
+
+ t.onclick=()=>{const k=b.dataset.n;if(DB.has(k))DB.delete(k);else if(DB.size<DB_MAX&&answered(b))DB.add(k);dbRender()}});
+f.addEventListener('input',dbRender);f.addEventListener('change',dbRender);setTimeout(dbRender,0);
+
 try{const s=JSON.parse(localStorage.getItem('req')||'{}');for(const[k,v]of Object.entries(s))[].concat(v).forEach(x=>{f.querySelectorAll(`[name="${k}"]`).forEach(e=>{if(e.type=='radio'||e.type=='checkbox'){if(e.value==x)e.checked=true}else e.value=x})});prog()}catch(e){}
 // ---- step-by-step navigation ----
 const steps=[document.getElementById('s-contact'),...f.querySelectorAll('.step')];let cur=0;
@@ -202,8 +220,8 @@ go.onclick=()=>{if(go.disabled)return;blocks.forEach(b=>b.classList.remove('err'
  <p style="color:var(--muted);font-size:14px">Your detailed personalised report with our top 3 picks will be emailed to you.</p>`;
  out.scrollIntoView({behavior:'smooth'});
  // Save the submission: every question with its weight and answer, plus the computed profile
- const answers=blocks.map((b,i)=>{const v=[].concat(d[b.dataset.n]??[]);return{n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:+b.dataset.w,a:v.join(', ')}}).filter(r=>r.a);
- const profile={budget:bud,fuel:top[0]?top[0].v:'',gearbox:top[1]?top[1].v:'',body:top[2]?top[2].v:'',confidence:conf,warnings:warn};
+ const answers=blocks.map((b,i)=>{const v=[].concat(d[b.dataset.n]??[]);const r={n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:+b.dataset.w,a:v.join(', ')};if(DB.has(b.dataset.n))r.db=1;return r}).filter(r=>r.a);
+ const profile={dealBreakers:answers.filter(r=>r.db).map(r=>r.n),budget:bud,fuel:top[0]?top[0].v:'',gearbox:top[1]?top[1].v:'',body:top[2]?top[2].v:'',confidence:conf,warnings:warn};
  saveSub({name:cname.value.trim(),contact:cemail.value.trim()+(cphone.value.trim()?' · '+cphone.value.trim():''),submittedAt:new Date().toISOString(),status:'new',answers,profile});};
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwSMA9dt0j44iWKHdCzifmDDrMKR20ARDj4iAjxjLDVe3bz1O2vEvn2uqp_8EwTsPSW/exec';
 async function saveSub(doc){saved.textContent='Submitting your answers…';go.disabled=true;go.textContent='Submitting…';
