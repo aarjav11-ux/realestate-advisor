@@ -99,6 +99,7 @@ button:not(.ghost){box-shadow:0 6px 18px rgba(194,97,31,.25)}
 .dbt:hover{border-color:#b42318;color:#b42318}.dbt.on{background:#fde8e6;border-color:#b42318;color:#b42318}.dbt:disabled{opacity:.45;cursor:not-allowed}
 .dbt.full{opacity:.55}.dbn{font-size:13px;color:#b42318;margin:6px 0 0}.q.isdb{border-left:4px solid #b42318;padding-left:12px}
 .bar .meta{gap:14px}#dbc{font-size:13px;font-weight:600;color:#b42318;margin-left:auto}#dbmsg{font-size:13px;color:#b42318;margin:6px 0 0;min-height:1em}
+.chips label .rk{display:none;margin-right:6px;background:var(--acc);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px}.chips label:has(input:checked) .rk{display:inline-block}.rkhint{font-size:13px;color:var(--muted);margin:-4px 0 8px}
 </style></head><body><div class="topnav"><div class="in"><a class="logo" href="https://aarjav11-ux.github.io/realestate/"><i>🏢</i>Gurgaon Property Advisor</a><a class="home" href="https://aarjav11-ux.github.io/realestate/">← Back to website</a></div></div><main>
 <header class="hero">
 <span class="eb">Booking se pehle ek baar</span>
@@ -155,7 +156,7 @@ S.forEach(([title,qs],si)=>{html+=`<section class="step" data-title="${title}"><
  qs.forEach(q=>{N++;const [ty,t,o,req,key]=q;const id='q'+N,nm=key||id,rq=req?'req':'',wt=W[SRC[N-1]];KW[nm]=wt;let b='';
   if(ty=='n'||ty=='t')b=`<input type="${ty=='n'?'number':'text'}" name="${nm}" id="${id}" placeholder="${o}" ${ty=='n'?'min="0"':''}>`;
   else if(ty=='r')b='<div class="opts">'+o.split('|').map(x=>`<label class="opt"><input type="radio" name="${nm}" value="${x}"><span class="dot"></span><span>${x}</span></label>`).join('')+'</div>';
-  else b='<div class="chips">'+o.split('|').map(x=>`<label><input type="checkbox" name="${nm}" value="${x}"><span>${x}</span></label>`).join('')+'</div>';
+  else b='<div class="chips">'+o.split('|').map(x=>`<label><input type="checkbox" name="${nm}" value="${x}"><span><b class="rk"></b>${x}</span></label>`).join('')+'</div>';if(ty=='m')b='<p class="rkhint">Pick in order of priority: your first tap is #1, the next #2, and so on.</p>'+b;
   const blk=`<div class="q" data-n="${nm}" data-req="${req}" data-w="${wt}"><label class="t ${rq}" for="${id}"><span class="n">${N}.</span>${t}<span class="w w${wt}" title="Importance weight ${wt} of 5">${WL[wt]}</span></label><p class="err-msg">Please answer this question.</p>${b}</div>`;
   if(ty=='n'&&(key=='mkm'||key=='ykm')){pair.push(blk);if(pair.length==2){html+=`<div class="row">${pair.join('')}</div>`;pair=[]}}else html+=blk;});html+='</section>';});
 f.innerHTML=html;
@@ -163,6 +164,16 @@ const blocks=[...f.querySelectorAll('.q')];
 function answered(b){const els=f.querySelectorAll(`[name="${b.dataset.n}"]`);return [...els].some(e=>(e.type=='radio'||e.type=='checkbox')?e.checked:e.value.trim()!=='')}
 function prog(){const a=blocks.filter(answered).length;pc.textContent=`${a} of ${N} answered`;pb.style.width=a/N*100+'%'}
 f.addEventListener('input',prog);
+// ---- multi-select priority order: the order of taps is the ranking ----
+let ORD={};try{ORD=JSON.parse(localStorage.getItem('req-ord')||'{}')}catch(e){}
+const ORDN=['1st','2nd','3rd'];const ordLabel=i=>ORDN[i]||(i+1)+'th';
+function ordRender(){f.querySelectorAll('.chips').forEach(c=>{const ins=[...c.querySelectorAll('input')];if(!ins.length)return;const nm=ins[0].name;
+ const on=ins.filter(i=>i.checked).map(i=>i.value);let o=(ORD[nm]||[]).filter(v=>on.includes(v));on.forEach(v=>{if(!o.includes(v))o.push(v)});ORD[nm]=o;
+ ins.forEach(i=>{i.closest('label').querySelector('.rk').textContent=i.checked?ordLabel(o.indexOf(i.value)):''})});
+ try{localStorage.setItem('req-ord',JSON.stringify(ORD))}catch(e){}}
+f.addEventListener('change',e=>{if(e.target.type=='checkbox'){const nm=e.target.name,o=ORD[nm]||[];ORD[nm]=e.target.checked?[...o.filter(v=>v!=e.target.value),e.target.value]:o.filter(v=>v!=e.target.value)}ordRender()});
+setTimeout(ordRender,0);
+
 // ---- deal-breakers: user marks up to DB_MAX answered questions as non-negotiable ----
 const DB_MAX=10;let DB=new Set();try{DB=new Set(JSON.parse(localStorage.getItem('req-db')||'[]'))}catch(e){}
 const dbc=document.createElement('span');dbc.id='dbc';document.querySelector('.bar .meta').appendChild(dbc);
@@ -220,7 +231,7 @@ go.onclick=()=>{if(go.disabled)return;blocks.forEach(b=>b.classList.remove('err'
  <p style="color:var(--muted);font-size:14px">Your detailed personalised report with our top 3 picks will be emailed to you.</p>`;
  out.scrollIntoView({behavior:'smooth'});
  // Save the submission: every question with its weight and answer, plus the computed profile
- const answers=blocks.map((b,i)=>{const v=[].concat(d[b.dataset.n]??[]);const r={n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:+b.dataset.w,a:v.join(', ')};if(DB.has(b.dataset.n))r.db=1;return r}).filter(r=>r.a);
+ const answers=blocks.map((b,i)=>{let v=[].concat(d[b.dataset.n]??[]);if(b.querySelector('.chips')&&v.length>1){const o=ORD[b.dataset.n]||v;v=o.filter(x=>v.includes(x)).map((x,j)=>ordLabel(j)+': '+x)}const r={n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:+b.dataset.w,a:v.join(', ')};if(DB.has(b.dataset.n))r.db=1;return r}).filter(r=>r.a);
  const profile={dealBreakers:answers.filter(r=>r.db).map(r=>r.n),budget:bud,fuel:top[0]?top[0].v:'',gearbox:top[1]?top[1].v:'',body:top[2]?top[2].v:'',confidence:conf,warnings:warn};
  saveSub({name:cname.value.trim(),contact:cemail.value.trim()+(cphone.value.trim()?' · '+cphone.value.trim():''),submittedAt:new Date().toISOString(),status:'new',answers,profile});};
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwSMA9dt0j44iWKHdCzifmDDrMKR20ARDj4iAjxjLDVe3bz1O2vEvn2uqp_8EwTsPSW/exec';
