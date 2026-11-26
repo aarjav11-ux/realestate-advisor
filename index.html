@@ -101,7 +101,7 @@ button:not(.ghost){box-shadow:0 6px 18px rgba(194,97,31,.25)}
 .bar .meta{gap:14px}#dbc{font-size:13px;font-weight:600;color:#b42318;margin-left:auto}#dbmsg{font-size:13px;color:#b42318;margin:6px 0 0;min-height:1em}
 .chips label .rk{display:none;margin-right:6px;background:var(--acc);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px}.chips label:has(input:checked) .rk{display:inline-block}.rkhint{font-size:13px;color:var(--muted);margin:-4px 0 8px}
 .q{position:relative}.q .qi{float:left;width:42px;height:42px;margin:0 12px 6px 0;border-radius:12px;background:var(--acc-soft);display:grid;place-items:center;font-size:22px;line-height:1}.q .qi+label.t{min-height:42px;padding-top:9px;margin-left:54px}.q .qi{position:absolute}.q .qi+label.t+*,.q>.opts,.q>.chips,.q>input,.q>.rkhint{clear:both}.step-head h2 .si{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--acc-soft);margin-right:10px;font-size:24px;vertical-align:middle}
-</style></head><body><div class="topnav"><div class="in"><a class="logo" href="https://aarjav11-ux.github.io/realestate/"><i>🏢</i>Gurgaon Property Advisor</a><a class="home" href="https://aarjav11-ux.github.io/realestate/">← Back to website</a></div></div><main>
+</style><style id="dbk-css">.dbk{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;color:var(--muted);cursor:pointer;user-select:none}.dbk input{width:17px;height:17px;accent-color:#b42318;margin:0}.q[data-db="1"]{border-color:#f1b8b8;box-shadow:0 0 0 1px #f1b8b8}.q[data-db="1"] .dbk{color:#b42318;font-weight:600}</style></head><body><div class="topnav"><div class="in"><a class="logo" href="https://aarjav11-ux.github.io/realestate/"><i>🏢</i>Gurgaon Property Advisor</a><a class="home" href="https://aarjav11-ux.github.io/realestate/">← Back to website</a></div></div><main>
 <header class="hero">
 <span class="eb">Booking se pehle ek baar</span>
 <h1>Find the right Gurgaon property for you</h1>
@@ -233,7 +233,7 @@ go.onclick=()=>{if(go.disabled)return;blocks.forEach(b=>b.classList.remove('err'
  <p style="color:var(--muted);font-size:14px">Your detailed personalised report with our top 3 picks will be emailed to you.</p>`;
  out.scrollIntoView({behavior:'smooth'});
  // Save the submission: every question with its weight and answer, plus the computed profile
- const answers=blocks.map((b,i)=>{let v=[].concat(d[b.dataset.n]??[]);if(b.querySelector('.chips')&&v.length>1){const o=ORD[b.dataset.n]||v;v=o.filter(x=>v.includes(x)).map((x,j)=>ordLabel(j)+': '+x)}const r={n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:+b.dataset.w,a:v.join(', ')};if(DB.has(b.dataset.n))r.db=1;return r}).filter(r=>r.a);
+ const answers=blocks.map((b,i)=>{let v=[].concat(d[b.dataset.n]??[]);if(b.querySelector('.chips')&&v.length>1){const o=ORD[b.dataset.n]||v;v=o.filter(x=>v.includes(x)).map((x,j)=>ordLabel(j)+': '+x)}const r={n:i+1,q:b.querySelector('label.t').firstChild.nextSibling.textContent,w:b.dataset.db?5:+b.dataset.w,db:b.dataset.db?1:0,a:v.join(', ')};if(DB.has(b.dataset.n))r.db=1;return r}).filter(r=>r.a);
  const profile={dealBreakers:answers.filter(r=>r.db).map(r=>r.n),budget:bud,fuel:top[0]?top[0].v:'',gearbox:top[1]?top[1].v:'',body:top[2]?top[2].v:'',confidence:conf,warnings:warn};
  saveSub({name:cname.value.trim(),contact:cemail.value.trim()+(cphone.value.trim()?' · '+cphone.value.trim():''),submittedAt:new Date().toISOString(),status:'new',answers,profile});};
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwSMA9dt0j44iWKHdCzifmDDrMKR20ARDj4iAjxjLDVe3bz1O2vEvn2uqp_8EwTsPSW/exec';
@@ -262,4 +262,11 @@ document.getElementById('fb-go').onclick=async()=>{if(!fbStar){document.getEleme
  const b=document.getElementById('fb-go');b.disabled=true;b.textContent='Sending…';
  try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({name:'FEEDBACK · '+cname.value.trim(),contact:cemail.value.trim(),profile:{budget:'',fuel:'Rating '+fbStar+'/5',gearbox:'Ease: '+g('ease'),body:'Length: '+g('length'),confidence:'',warnings:[]},answers})})}catch(e){}
  document.getElementById('fb').style.display='none';document.getElementById('fb-done').style.display='block'};
-</script></body></html>
+</script><script>(function(){
+var K='dbk:'+location.pathname,S={};try{S=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function go(){[].forEach.call(document.querySelectorAll('.q[data-n]'),function(b){if(b.querySelector('.dbk'))return;var n=b.dataset.n;
+var l=document.createElement('label');l.className='dbk';l.innerHTML='<input type="checkbox"> Deal breaker for me';var c=l.firstChild;
+if(S[n]){c.checked=true;b.dataset.db='1'}
+c.onchange=function(){if(c.checked){b.dataset.db='1';S[n]=1}else{delete b.dataset.db;delete S[n]}save()};b.appendChild(l)})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();</script></body></html>
